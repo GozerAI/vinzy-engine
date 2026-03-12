@@ -3,7 +3,7 @@ FROM python:3.12-slim
 LABEL org.opencontainers.image.title="Vinzy-Engine"
 LABEL org.opencontainers.image.description="Cryptographic License Key Generator & Entitlement Manager"
 LABEL org.opencontainers.image.version="0.1.0"
-LABEL org.opencontainers.image.vendor="1450 Enterprises LLC"
+LABEL org.opencontainers.image.vendor="GozerAI"
 
 # Create non-root user
 RUN groupadd --gid 1000 vinzy && \

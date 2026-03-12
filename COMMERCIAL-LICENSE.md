@@ -28,8 +28,8 @@ The AGPL-3.0 requires that if you run a modified version of this software as a n
 
 For commercial licensing inquiries, contact:
 
-- Email: licensing@1450enterprises.com
-- GitHub: [@chrisarseno](https://github.com/GozerAI)
+- Email: licensing@gozerai.com
+- GitHub: [@GozerAI](https://github.com/GozerAI)
 
 ## What the Commercial License Includes
 
@@ -40,4 +40,4 @@ For commercial licensing inquiries, contact:
 
 ## Copyright
 
-Copyright (c) 2025-2026 Chris Arsenault / 1450 Enterprises LLC. All rights reserved.
+Copyright (c) 2025-2026 Chris Arsenault / GozerAI. All rights reserved.

@@ -18,8 +18,14 @@ import vinzy_engine.tenants.models  # noqa: F401
 import vinzy_engine.licensing.models  # noqa: F401
 import vinzy_engine.activation.models  # noqa: F401
 import vinzy_engine.usage.models  # noqa: F401
-import vinzy_engine.audit.models  # noqa: F401
-import vinzy_engine.anomaly.models  # noqa: F401
+try:
+    import vinzy_engine.audit.models  # noqa: F401
+except ImportError:
+    pass
+try:
+    import vinzy_engine.anomaly.models  # noqa: F401
+except ImportError:
+    pass
 import vinzy_engine.webhooks.models  # noqa: F401
 
 

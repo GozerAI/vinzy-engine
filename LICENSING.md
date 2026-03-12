@@ -7,7 +7,7 @@ This project is dual-licensed:
 
 ## Tiers
 
-| Feature | Community (Free) | Pro ($149/mo) | Enterprise ($499/mo) |
+| Feature | Community (Free) | Pro | Enterprise |
 |---------|:---:|:---:|:---:|
 | Key generation & validation | Yes | Yes | Yes |
 | Activation & heartbeat | Yes | Yes | Yes |
@@ -22,11 +22,11 @@ This project is dual-licensed:
 
 ## Getting a License
 
-Visit **https://1450enterprises.com/pricing** or contact sales@1450enterprises.com.
+Visit **https://gozerai.com/pricing** or contact sales@gozerai.com.
 
 ```bash
 export VINZY_LICENSE_KEY="your-key-here"
-export VINZY_SERVER="https://api.1450enterprises.com"
+export VINZY_SERVER="https://api.gozerai.com"
 ```
 
 ## Feature Flags

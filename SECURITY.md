@@ -11,7 +11,7 @@
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do not** open a public GitHub issue
-2. Email: security@1450enterprises.com
+2. Email: security@gozerai.com
 3. Include a detailed description and steps to reproduce
 
 ### Response Timeline

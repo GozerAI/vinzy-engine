@@ -18,7 +18,7 @@
 ### Local Development
 
 ```bash
-cd F:\Projects\vinzy-engine
+cd vinzy-engine
 pip install -e ".[dev]"
 
 # Start with SQLite (default)
@@ -37,7 +37,7 @@ Server starts at `http://localhost:8080` with:
 Vinzy is included in the gozerai-infra `docker-compose.yml`:
 
 ```bash
-cd F:\Projects\gozerai-infra
+cd gozerai-infra
 docker compose up vinzy
 ```
 
@@ -160,7 +160,7 @@ Generate secrets: `python -c "import secrets; print(secrets.token_hex(32))"`
 
 ```bash
 # Requires PYTHONPATH=src or editable install
-cd F:\Projects\vinzy-engine
+cd vinzy-engine
 PYTHONPATH=src alembic upgrade head
 ```
 
@@ -205,8 +205,6 @@ PYTHONPATH=src alembic upgrade head
 | ShopForge | 8003 | 8003 |
 | BrandGuard | 8004 | 8004 |
 | TaskPilot | 8005 | 8005 |
-| C-Suite Eval | 8006 | 8006 |
-| C-Suite | 8007 | 3737 |
 | Nexus | 8008 | 8080 |
 | Sentinel | 8009 | 8080 |
 | ShandorCode | 8010 | 8765 |
