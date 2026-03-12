@@ -53,7 +53,8 @@ async def activate(request: Request, body: ActivateRequest):
 
 
 @router.post("/deactivate", response_model=DeactivateResponse)
-async def deactivate(body: DeactivateRequest):
+@limiter.limit(_public_limit)
+async def deactivate(request: Request, body: DeactivateRequest):
     svc = _get_service()
     db = _get_db()
     try:

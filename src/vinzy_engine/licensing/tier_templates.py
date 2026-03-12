@@ -1,4 +1,4 @@
-"""Tier definitions and feature flags for all GozerAI ecosystem products.
+"""Tier definitions and feature flags for all GozerAI products.
 
 Each product has three tiers: community, pro, enterprise.
 Feature flags follow the convention: {product}.{module}.{capability}
@@ -17,6 +17,7 @@ PRODUCT_CODES = {
     "AGW": "ag3ntwerk",
     "ZUL": "zuultimate",
     "VNZ": "vinzy-engine",
+    "CSM": "csuite-model",
     "STD": "standalone-bundle",
 }
 
@@ -125,6 +126,27 @@ def _vnz_features(tier: str) -> dict[str, Any]:
     }
 
 
+def _csm_features(tier: str) -> dict[str, Any]:
+    """csuite-model feature flags by tier."""
+    if tier == "community":
+        return {}
+
+    pro = {
+        "csm.distillation.multi_teacher": True,
+        "csm.distillation.training_phases": True,
+        "csm.distillation.eval_suite": True,
+    }
+    if tier == "pro":
+        return pro
+
+    return {
+        **pro,
+        "csm.executives.personalities": True,
+        "csm.executives.governance": True,
+        "csm.executives.modelfiles": True,
+    }
+
+
 def _std_features(tier: str) -> dict[str, Any]:
     """standalone-bundle feature flags by tier (trendscope, shopforge, etc.)."""
     if tier == "community":
@@ -161,6 +183,7 @@ _PRODUCT_FEATURE_RESOLVERS = {
     "AGW": _agw_features,
     "ZUL": _zul_features,
     "VNZ": _vnz_features,
+    "CSM": _csm_features,
     "STD": _std_features,
 }
 
@@ -169,7 +192,7 @@ def resolve_tier_features(product_code: str, tier: str) -> dict[str, Any]:
     """Resolve the full feature dict for a product code + tier.
 
     Args:
-        product_code: 3-char product code (AGW, ZUL, VNZ, STD).
+        product_code: 3-char product code (AGW, ZUL, VNZ, CSM, STD).
         tier: One of 'community', 'pro', 'enterprise'.
 
     Returns:
@@ -231,6 +254,12 @@ PRODUCT_SEEDS = [
         "code": "VNZ",
         "name": "vinzy-engine",
         "description": "Cryptographic license key generator and manager",
+        "default_tier": "community",
+    },
+    {
+        "code": "CSM",
+        "name": "csuite-model",
+        "description": "LoRA fine-tuning pipeline for executive AI agents",
         "default_tier": "community",
     },
     {

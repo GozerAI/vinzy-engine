@@ -43,6 +43,7 @@ class WebhookService:
     def __init__(self, settings: VinzySettings):
         self.settings = settings
         self._http_client = None
+        self._pending_tasks: set = set()
 
     def _get_http_client(self):
         """Lazy-init httpx.AsyncClient."""
@@ -176,8 +177,8 @@ class WebhookService:
             session.add(delivery)
             await session.flush()
 
-            # Fire-and-forget async delivery
-            asyncio.create_task(
+            # Fire-and-forget async delivery (tracked to prevent GC)
+            task = asyncio.create_task(
                 self._send_delivery(
                     delivery_id=delivery.id,
                     url=ep.url,
@@ -187,6 +188,8 @@ class WebhookService:
                     timeout=ep.timeout_seconds,
                 )
             )
+            self._pending_tasks.add(task)
+            task.add_done_callback(self._pending_tasks.discard)
             deliveries.append(delivery)
 
         return deliveries
@@ -330,7 +333,7 @@ class WebhookService:
         delivery.next_retry_at = None
         await session.flush()
 
-        asyncio.create_task(
+        task = asyncio.create_task(
             self._send_delivery(
                 delivery_id=delivery.id,
                 url=endpoint.url,
@@ -340,4 +343,6 @@ class WebhookService:
                 timeout=endpoint.timeout_seconds,
             )
         )
+        self._pending_tasks.add(task)
+        task.add_done_callback(self._pending_tasks.discard)
         return delivery

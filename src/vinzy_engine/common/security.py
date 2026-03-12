@@ -1,5 +1,6 @@
 """API key authentication dependencies."""
 
+import hmac
 import ipaddress
 from dataclasses import dataclass
 from typing import Optional
@@ -21,7 +22,7 @@ async def require_api_key(
     from vinzy_engine.common.config import get_settings
 
     settings = get_settings()
-    if x_vinzy_api_key != settings.api_key:
+    if not hmac.compare_digest(x_vinzy_api_key, settings.api_key):
         raise HTTPException(status_code=403, detail="Invalid API key")
     return x_vinzy_api_key
 
@@ -33,7 +34,7 @@ async def require_super_admin(
     from vinzy_engine.common.config import get_settings
 
     settings = get_settings()
-    if x_vinzy_api_key != settings.super_admin_key:
+    if not hmac.compare_digest(x_vinzy_api_key, settings.super_admin_key):
         raise HTTPException(status_code=403, detail="Invalid super-admin key")
     return x_vinzy_api_key
 

@@ -7,7 +7,7 @@ This project is dual-licensed:
 
 ## Tiers
 
-| Feature | Community (Free) | Pro | Enterprise |
+| Feature | Community (Free) | Pro ($149/mo) | Enterprise ($499/mo) |
 |---------|:---:|:---:|:---:|
 | Key generation & validation | Yes | Yes | Yes |
 | Activation & heartbeat | Yes | Yes | Yes |

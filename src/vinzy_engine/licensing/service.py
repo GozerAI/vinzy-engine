@@ -443,7 +443,7 @@ class LicensingService:
             "message": "License is valid",
             "license": {
                 "id": license_obj.id,
-                "key": raw_key,
+                "key": raw_key[:4] + "..." + raw_key[-4:],
                 "status": license_obj.status,
                 "product_code": product_code,
                 "customer_id": license_obj.customer_id,

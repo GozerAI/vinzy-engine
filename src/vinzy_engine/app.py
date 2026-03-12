@@ -4,9 +4,23 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
 
 from vinzy_engine.common.config import get_settings
 from vinzy_engine.common.schemas import HealthResponse
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response: StarletteResponse = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+        return response
 
 
 def create_app() -> FastAPI:
@@ -67,5 +81,6 @@ def create_app() -> FastAPI:
     app.include_router(usage_router, prefix=prefix, tags=["usage"])
     app.include_router(webhook_router, prefix=prefix, tags=["webhooks"])
 
+    # Mount dashboard sub-application
 
     return app
