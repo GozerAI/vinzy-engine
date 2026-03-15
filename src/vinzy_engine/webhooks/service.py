@@ -11,6 +11,7 @@ from typing import Any, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from vinzy_engine.common.caching import get_webhook_status_cache
 from vinzy_engine.common.config import VinzySettings
 from vinzy_engine.webhooks.models import WebhookDeliveryModel, WebhookEndpointModel
 
@@ -278,6 +279,15 @@ class WebhookService:
                 delivery.last_error = error
                 if status == "failed":
                     delivery.next_retry_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+
+                # Cache delivery status
+                cache = get_webhook_status_cache()
+                cache.set(f"delivery:{delivery_id}", {
+                    "status": status,
+                    "attempts": attempts,
+                    "last_response_code": response_code,
+                    "last_error": error,
+                })
         except Exception:
             logger.exception("Failed to update delivery %s", delivery_id)
 
@@ -312,7 +322,17 @@ class WebhookService:
                 WebhookDeliveryModel.id == delivery_id,
             )
         )
-        return result.scalar_one_or_none()
+        delivery = result.scalar_one_or_none()
+        if delivery is not None:
+            # Update status cache
+            cache = get_webhook_status_cache()
+            cache.set(f"delivery:{delivery_id}", {
+                "status": delivery.status,
+                "attempts": delivery.attempts,
+                "last_response_code": delivery.last_response_code,
+                "last_error": delivery.last_error,
+            })
+        return delivery
 
     async def retry_delivery(
         self, session: AsyncSession, delivery_id: str,

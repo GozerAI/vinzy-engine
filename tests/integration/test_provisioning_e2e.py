@@ -277,6 +277,9 @@ class TestGracefulDegradation:
             "provision_tenant",
             new_callable=AsyncMock,
             side_effect=Exception("Connection refused"),
+        ), patch.dict("os.environ", {"VINZY_STRIPE_WEBHOOK_SECRET": "whsec_test"}), patch(
+            "vinzy_engine.provisioning.router.verify_stripe_signature",
+            return_value=True,
         ):
             payload = {
                 "type": "checkout.session.completed",

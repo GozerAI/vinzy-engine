@@ -52,7 +52,7 @@ async def seed_products() -> None:
         await session.commit()
 
     await db.close()
-    print("\nDone. 5 products seeded.")
+    print(f"\nDone. {len(PRODUCT_SEEDS)} products seeded.")
 
 
 if __name__ == "__main__":

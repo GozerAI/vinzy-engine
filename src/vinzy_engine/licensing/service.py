@@ -6,6 +6,12 @@ from typing import Any, Optional
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from vinzy_engine.common.caching import (
+    get_entitlement_cache,
+    get_hmac_cache,
+    get_invalidation_bus,
+    get_validation_cache,
+)
 from vinzy_engine.common.config import VinzySettings
 from vinzy_engine.common.exceptions import (
     InvalidKeyError,
@@ -289,6 +295,14 @@ class LicensingService:
 
         await session.flush()
 
+        # Invalidate caches
+        bus = get_invalidation_bus()
+        bus.publish("license", license_id)
+        bus.publish("entitlement", license_id)
+        # Invalidate validation cache by key_hash
+        validation_cache = get_validation_cache()
+        validation_cache.invalidate(f"val:{license_obj.key_hash}")
+
         # Audit: license.updated
         if self.audit_service:
             await self.audit_service.record_event(
@@ -315,6 +329,13 @@ class LicensingService:
         license_obj.deleted_at = datetime.now(timezone.utc)
         await session.flush()
 
+        # Invalidate caches
+        bus = get_invalidation_bus()
+        bus.publish("license", license_id)
+        bus.publish("entitlement", license_id)
+        validation_cache = get_validation_cache()
+        validation_cache.invalidate(f"val:{license_obj.key_hash}")
+
         # Audit: license.deleted
         if self.audit_service:
             await self.audit_service.record_event(
@@ -338,17 +359,32 @@ class LicensingService:
     ) -> dict:
         """
         Full server-side validation:
-        1. Offline HMAC check
+        1. Offline HMAC check (with cache)
         2. DB lookup
         3. Status + expiry checks
-        4. Resolve entitlements
+        4. Resolve entitlements (with cache)
 
         Returns a dict matching ValidationResponse shape.
         """
-        # Step 1: Offline check (uses keyring for rotation support)
-        offline = validate_key_multi(raw_key, self.settings.hmac_keyring)
-        if not offline.valid:
-            raise InvalidKeyError(offline.message)
+        # Check validation response cache first
+        cache_key = key_hash(raw_key)
+        validation_cache = get_validation_cache()
+        cached = validation_cache.get(f"val:{cache_key}")
+        if cached is not None:
+            return cached
+
+        # Step 1: Offline check with HMAC cache
+        hmac_cache = get_hmac_cache()
+        hmac_cache_key = f"hmac:{raw_key}"
+        hmac_result = hmac_cache.get(hmac_cache_key)
+        if hmac_result is None:
+            offline = validate_key_multi(raw_key, self.settings.hmac_keyring)
+            hmac_cache.set(hmac_cache_key, offline.valid)
+            hmac_result = offline.valid
+            if not offline.valid:
+                raise InvalidKeyError(offline.message)
+        elif not hmac_result:
+            raise InvalidKeyError("Key HMAC signature does not match")
 
         # Step 2: DB lookup
         license_obj = await self.get_license_by_key(session, raw_key)
@@ -437,7 +473,7 @@ class LicensingService:
                 {"license_id": license_obj.id, "product_code": product_code},
             )
 
-        return {
+        result = {
             "valid": True,
             "code": "OK",
             "message": "License is valid",
@@ -460,6 +496,15 @@ class LicensingService:
             "agents": agents_list,
             "lease": lease,
         }
+
+        # Cache the validation response (30s TTL)
+        validation_cache.set(f"val:{cache_key}", result)
+
+        # Cache entitlements by license_id (60s TTL)
+        ent_cache = get_entitlement_cache()
+        ent_cache.set(f"ent:{license_obj.id}", resolved)
+
+        return result
 
     async def check_agent_entitlement(
         self,
@@ -502,6 +547,13 @@ class LicensingService:
         tenant_id: str | None = None,
     ) -> dict:
         """Compose entitlements across all active licenses for a customer."""
+        # Check entitlement cache
+        ent_cache = get_entitlement_cache()
+        cache_key = f"composed:{customer_id}:{tenant_id or 'none'}"
+        cached = ent_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         from vinzy_engine.licensing.composition import compose_customer_entitlements
 
         query = select(LicenseModel).where(
@@ -527,7 +579,7 @@ class LicensingService:
 
         composed = compose_customer_entitlements(licenses, products)
 
-        return {
+        result = {
             "customer_id": customer_id,
             "total_products": composed.total_products,
             "features": [
@@ -544,3 +596,7 @@ class LicensingService:
             ],
             "agents": composed.agents,
         }
+
+        # Cache the composed result
+        ent_cache.set(cache_key, result)
+        return result

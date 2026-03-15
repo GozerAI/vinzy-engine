@@ -62,6 +62,16 @@ class CustomerModel(Base, TimestampMixin):
 
 class LicenseModel(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "licenses"
+    __table_args__ = (
+        # Covering index for activation checks: avoids full table scan
+        Index("ix_licenses_product_keyhash_status", "product_id", "key_hash", "status"),
+        # Composite index for soft-delete-aware key lookups
+        Index("ix_licenses_keyhash_deleted", "key_hash", "is_deleted"),
+        # Index for background expiration processing
+        Index("ix_licenses_status_expires", "status", "expires_at"),
+        # Index for hard-delete cleanup
+        Index("ix_licenses_deleted_at", "is_deleted", "deleted_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=generate_uuid)
     tenant_id: Mapped[str | None] = mapped_column(
@@ -72,10 +82,10 @@ class LicenseModel(Base, TimestampMixin, SoftDeleteMixin):
     tier: Mapped[str] = mapped_column(String(50), default="standard")
 
     product_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("products.id"), nullable=False
+        String(36), ForeignKey("products.id"), nullable=False, index=True
     )
     customer_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("customers.id"), nullable=False
+        String(36), ForeignKey("customers.id"), nullable=False, index=True
     )
 
     machines_limit: Mapped[int] = mapped_column(Integer, default=3)
@@ -87,6 +97,8 @@ class LicenseModel(Base, TimestampMixin, SoftDeleteMixin):
     features: Mapped[dict] = mapped_column(JSON, default=dict)
     entitlements: Mapped[dict] = mapped_column(JSON, default=dict)
     metadata_: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
+    blind_pass_token: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    client_key_shard: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     product: Mapped["ProductModel"] = relationship(back_populates="licenses")
     customer: Mapped["CustomerModel"] = relationship(back_populates="licenses")

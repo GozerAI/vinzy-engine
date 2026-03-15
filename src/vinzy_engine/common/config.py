@@ -67,6 +67,11 @@ class VinzySettings(BaseSettings):
     zuultimate_base_url: str = ""
     zuultimate_service_token: str = ""
 
+    # Product callback registry — JSON mapping product codes to webhook URLs
+    # e.g. '{"ARC": "https://arclane.cloud/api/billing/provision-complete", "TS": "https://trendscope.io/api/webhook"}'
+    product_callbacks: str = ""
+    product_callback_token: str = ""
+
     @property
     def hmac_keyring(self) -> dict[int, str]:
         """Return HMAC keyring as {version_int: key_str}.

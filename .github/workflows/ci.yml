@@ -27,7 +27,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run tests
-        run: pytest tests/ -q --tb=short
+        run: pytest tests/ -v --tb=short --cov --cov-report=term-missing
 
       - name: Verify migrations
         run: |

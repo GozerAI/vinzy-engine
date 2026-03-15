@@ -1,5 +1,6 @@
 """FastAPI application factory for Vinzy-Engine."""
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,6 +11,8 @@ from starlette.responses import Response as StarletteResponse
 
 from vinzy_engine.common.config import get_settings
 from vinzy_engine.common.schemas import HealthResponse
+
+logger = logging.getLogger(__name__)
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -29,12 +32,44 @@ def create_app() -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # Startup
-        from vinzy_engine.deps import get_db
+        from vinzy_engine.deps import get_db, get_audit_service
         db = get_db()
         await db.init()
         await db.create_all()
+
+        # Start database health monitoring
+        from vinzy_engine.common.health import get_health_monitor
+        health_monitor = get_health_monitor()
+        health_monitor.start(db)
+
+        # Start batch audit writer
+        from vinzy_engine.audit.batch import get_batch_audit_writer
+        batch_writer = get_batch_audit_writer()
+        batch_writer._audit_service = get_audit_service()
+        batch_writer._db_manager = db
+        batch_writer.start()
+
+        # Start background processors
+        from vinzy_engine.background import (
+            get_hard_delete_processor,
+            get_expiration_processor,
+            get_webhook_delivery_processor,
+            get_stripe_processor,
+        )
+        get_hard_delete_processor().start(db)
+        get_expiration_processor().start(db)
+        get_webhook_delivery_processor().start(db)
+        get_stripe_processor().start()
+
         yield
-        # Shutdown
+
+        # Shutdown — stop background tasks
+        await get_hard_delete_processor().stop()
+        await get_expiration_processor().stop()
+        await get_webhook_delivery_processor().stop()
+        await get_stripe_processor().stop()
+        await batch_writer.stop()
+        await health_monitor.stop()
         await db.close()
 
     app = FastAPI(
@@ -65,9 +100,22 @@ def create_app() -> FastAPI:
         app.state.limiter = limiter
         app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+    # Response compression (gzip/brotli)
+    from vinzy_engine.common.compression import CompressionMiddleware
+    app.add_middleware(CompressionMiddleware)
+
     @app.get("/health", response_model=HealthResponse)
     async def health():
         return HealthResponse(version=settings.api_version)
+
+    @app.get("/health/db")
+    async def health_db():
+        """Database connection health with detailed metrics."""
+        from vinzy_engine.common.health import get_health_monitor
+        monitor = get_health_monitor()
+        status = monitor.to_dict()
+        status_code = 200 if monitor.is_healthy else 503
+        return status
 
     # Mount routers
     from vinzy_engine.licensing.router import router as licensing_router
