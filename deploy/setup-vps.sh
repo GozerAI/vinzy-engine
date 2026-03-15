@@ -4,7 +4,7 @@
 set -euo pipefail
 
 APP_DIR="/opt/vinzy"
-REPO_URL="https://github.com/chrisarseno/vinzy-engine.git"
+REPO_URL="https://github.com/GozerAI/vinzy-engine.git"
 
 echo "=== Vinzy-Engine VPS Setup ==="
 
