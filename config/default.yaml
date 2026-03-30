@@ -1,0 +1,28 @@
+# Vinzy-Engine Default Configuration
+# Override via VINZY_ environment variables
+
+environment: development
+secret_key: insecure-dev-key-change-me
+hmac_key: insecure-hmac-key-change-me
+
+# Database (single DB for all entities)
+db_url: "sqlite+aiosqlite:///./data/vinzy.db"
+
+# API Server
+api_title: Vinzy-Engine
+api_version: "0.1.0"
+api_key: insecure-admin-key-change-me
+host: "0.0.0.0"
+port: 8080
+cors_origins:
+  - "http://localhost:3000"
+  - "http://localhost:8000"
+
+# Licensing defaults
+default_machines_limit: 3
+default_license_days: 365
+heartbeat_interval: 3600  # seconds
+
+# Pagination
+default_page_size: 20
+max_page_size: 100

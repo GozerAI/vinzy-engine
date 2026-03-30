@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Licenses{% endblock %}
+{% block content %}
+<h2>Licenses</h2>
+
+<!-- Filters -->
+<form method="get" action="/dashboard/licenses" style="margin-bottom:1rem">
+    <div class="inline-form">
+        <div>
+            <label for="status">Status</label>
+            <select id="status" name="status" onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                <option value="suspended" {% if status_filter == "suspended" %}selected{% endif %}>Suspended</option>
+                <option value="expired" {% if status_filter == "expired" %}selected{% endif %}>Expired</option>
+                <option value="revoked" {% if status_filter == "revoked" %}selected{% endif %}>Revoked</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<details>
+    <summary role="button" class="outline">New License</summary>
+    <form method="post" action="/dashboard/licenses"
+          hx-post="/dashboard/licenses" hx-target="#licenses-table" hx-swap="innerHTML">
+        <div class="inline-form">
+            <div>
+                <label for="product_code">Product</label>
+                <select id="product_code" name="product_code" required>
+                    {% for p in products %}
+                    <option value="{{ p.code }}">{{ p.code }} — {{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="customer_id">Customer</label>
+                <select id="customer_id" name="customer_id" required>
+                    {% for c in customers %}
+                    <option value="{{ c.id }}">{{ c.name }} ({{ c.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="tier">Tier</label>
+                <select id="tier" name="tier">
+                    <option value="standard">Standard</option>
+                    <option value="professional">Professional</option>
+                    <option value="enterprise">Enterprise</option>
+                </select>
+            </div>
+            <div>
+                <label for="machines_limit">Machines</label>
+                <input type="number" id="machines_limit" name="machines_limit" value="3" min="1">
+            </div>
+            <div>
+                <label for="days_valid">Days Valid</label>
+                <input type="number" id="days_valid" name="days_valid" value="365" min="1">
+            </div>
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</details>
+
+<div id="licenses-table">
+    {% include "licenses/_table.html" %}
+</div>
+{% endblock %}

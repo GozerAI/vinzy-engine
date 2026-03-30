@@ -1,0 +1,21 @@
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>License</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Metric</th>
+            <th>Z-Score</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in anomalies %}
+        {% include "anomalies/_row.html" %}
+        {% else %}
+        <tr><td colspan="7"><em>No anomalies found.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "partials/_pagination.html" %}

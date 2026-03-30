@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<h2>Customers</h2>
+
+<details>
+    <summary role="button" class="outline">New Customer</summary>
+    <form method="post" action="/dashboard/customers"
+          hx-post="/dashboard/customers" hx-target="#customers-table" hx-swap="innerHTML">
+        <div class="inline-form">
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" placeholder="Optional">
+            </div>
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</details>
+
+<div id="customers-table">
+    {% include "customers/_table.html" %}
+</div>
+{% endblock %}

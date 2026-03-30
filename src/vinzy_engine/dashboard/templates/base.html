@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dashboard{% endblock %} — Vinzy-Engine</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/dashboard/static/dashboard.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dash-header">
+        <h1>Vinzy-Engine</h1>
+        <div>
+            <small>{{ role }}</small>
+            <form method="post" action="/dashboard/logout" style="display:inline;margin:0">
+                <button type="submit" class="outline secondary" style="padding:0.25rem 0.75rem;margin:0;font-size:0.8rem">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="dash-nav">
+        {% for item in nav_items %}
+        <a href="{{ item.url }}" {% if item.active %}class="active"{% endif %}>
+            {{ item.label }}
+        </a>
+        {% endfor %}
+    </nav>
+
+    <!-- Flash container -->
+    <div class="flash-container" id="flash-container"></div>
+
+    <!-- Main content -->
+    <main class="dash-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Flash message handler -->
+    <script>
+    document.body.addEventListener("showFlash", function(evt) {
+        var d = evt.detail;
+        var container = document.getElementById("flash-container");
+        var div = document.createElement("div");
+        div.className = "flash-msg " + (d.level || "success");
+        div.textContent = d.message;
+        container.appendChild(div);
+        setTimeout(function() { div.remove(); }, 4000);
+    });
+    </script>
+</body>
+</html>

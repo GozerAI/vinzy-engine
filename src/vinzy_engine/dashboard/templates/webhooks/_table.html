@@ -1,0 +1,24 @@
+<table>
+    <thead>
+        <tr>
+            <th>URL</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Events</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ep in endpoints %}
+        <tr>
+            <td class="truncate">{{ ep.url }}</td>
+            <td>{{ ep.description or "—" }}</td>
+            <td><span class="badge badge-{{ ep.status }}">{{ ep.status }}</span></td>
+            <td>{{ ep.event_types|join(", ") if ep.event_types else "All" }}</td>
+            <td><a href="/dashboard/webhooks/{{ ep.id }}">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><em>No webhook endpoints.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Tenants{% endblock %}
+{% block content %}
+<h2>Tenants</h2>
+
+<details>
+    <summary role="button" class="outline">New Tenant</summary>
+    <form method="post" action="/dashboard/tenants"
+          hx-post="/dashboard/tenants" hx-target="#tenants-table" hx-swap="innerHTML">
+        <div class="inline-form">
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="slug">Slug</label>
+                <input type="text" id="slug" name="slug" required placeholder="my-tenant">
+            </div>
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</details>
+
+<div id="tenants-table">
+    {% include "tenants/_table.html" %}
+</div>
+{% endblock %}

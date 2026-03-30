@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Webhooks{% endblock %}
+{% block content %}
+<h2>Webhook Endpoints</h2>
+
+<details>
+    <summary role="button" class="outline">New Endpoint</summary>
+    <form method="post" action="/dashboard/webhooks"
+          hx-post="/dashboard/webhooks" hx-target="#webhooks-table" hx-swap="innerHTML">
+        <div class="inline-form">
+            <div>
+                <label for="url">URL</label>
+                <input type="url" id="url" name="url" required placeholder="https://example.com/webhook">
+            </div>
+            <div>
+                <label for="secret">Secret</label>
+                <input type="text" id="secret" name="secret" required placeholder="signing-secret">
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" placeholder="Optional">
+            </div>
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</details>
+
+<div id="webhooks-table">
+    {% include "webhooks/_table.html" %}
+</div>
+{% endblock %}

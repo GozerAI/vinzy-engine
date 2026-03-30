@@ -1,0 +1,20 @@
+<tr id="anomaly-{{ a.id }}">
+    <td>{{ a.created_at.strftime('%Y-%m-%d %H:%M') if a.created_at else "—" }}</td>
+    <td class="truncate"><a href="/dashboard/licenses/{{ a.license_id }}">{{ a.license_id[:12] }}…</a></td>
+    <td>{{ a.anomaly_type }}</td>
+    <td><span class="badge badge-{{ a.severity }}">{{ a.severity }}</span></td>
+    <td><code>{{ a.metric }}</code></td>
+    <td>{{ "%.2f"|format(a.z_score) }}</td>
+    <td>
+        {% if a.resolved %}
+        <span class="badge badge-active">Resolved</span>
+        <small>by {{ a.resolved_by }}</small>
+        {% else %}
+        <button class="outline" style="padding:0.15rem 0.5rem;font-size:0.75rem"
+                hx-post="/dashboard/anomalies/{{ a.id }}/resolve"
+                hx-target="#anomaly-{{ a.id }}" hx-swap="outerHTML">
+            Resolve
+        </button>
+        {% endif %}
+    </td>
+</tr>

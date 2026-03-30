@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+"""Generate community-tier deps.py for public export (strips audit/anomaly/tenants)."""
+import sys
+
+target_path = sys.argv[1]
+
+content = '"""Dependency injection singletons for Vinzy-Engine."""\n\nfrom vinzy_engine.common.config import VinzySettings, get_settings\nfrom vinzy_engine.common.database import DatabaseManager\nfrom vinzy_engine.licensing.service import LicensingService\nfrom vinzy_engine.activation.service import ActivationService\nfrom vinzy_engine.usage.service import UsageService\nfrom vinzy_engine.webhooks.service import WebhookService\n\n_db: DatabaseManager | None = None\n_licensing: LicensingService | None = None\n_activation: ActivationService | None = None\n_usage: UsageService | None = None\n_webhook: WebhookService | None = None\n\n\ndef get_db() -> DatabaseManager:\n    global _db\n    if _db is None:\n        _db = DatabaseManager(get_settings())\n    return _db\n\n\ndef get_webhook_service() -> WebhookService:\n    global _webhook\n    if _webhook is None:\n        _webhook = WebhookService(get_settings())\n    return _webhook\n\n\ndef get_licensing_service() -> LicensingService:\n    global _licensing\n    if _licensing is None:\n        _licensing = LicensingService(\n            get_settings(),\n            webhook_service=get_webhook_service(),\n        )\n    return _licensing\n\n\ndef get_activation_service() -> ActivationService:\n    global _activation\n    if _activation is None:\n        _activation = ActivationService(\n            get_settings(), get_licensing_service(),\n            webhook_service=get_webhook_service(),\n        )\n    return _activation\n\n\ndef get_usage_service() -> UsageService:\n    global _usage\n    if _usage is None:\n        _usage = UsageService(\n            get_settings(), get_licensing_service(),\n            webhook_service=get_webhook_service(),\n        )\n    return _usage\n\n\ndef reset_singletons() -> None:\n    """Reset all singletons (for testing)."""\n    global _db, _licensing, _activation, _usage, _webhook\n    _db = None\n    _licensing = None\n    _activation = None\n    _usage = None\n    _webhook = None\n'
+
+with open(target_path, "w", newline="\n") as f:
+    f.write(content)
+print(f"deps.py written to {target_path}")

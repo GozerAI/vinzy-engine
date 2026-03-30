@@ -1,0 +1,36 @@
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Status</th>
+            <th>Attempts</th>
+            <th>Response</th>
+            <th>Error</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in deliveries %}
+        <tr>
+            <td>{{ d.created_at.strftime('%Y-%m-%d %H:%M:%S') if d.created_at else "—" }}</td>
+            <td><code>{{ d.event_type }}</code></td>
+            <td><span class="badge badge-{{ d.status }}">{{ d.status }}</span></td>
+            <td>{{ d.attempts }}</td>
+            <td>{{ d.last_response_code or "—" }}</td>
+            <td class="truncate">{{ d.last_error or "—" }}</td>
+            <td>
+                {% if d.status == "failed" %}
+                <button class="outline" style="padding:0.15rem 0.5rem;font-size:0.75rem"
+                        hx-post="/dashboard/webhooks/deliveries/{{ d.id }}/retry"
+                        hx-target="#deliveries-table" hx-swap="innerHTML">
+                    Retry
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7"><em>No deliveries yet.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>

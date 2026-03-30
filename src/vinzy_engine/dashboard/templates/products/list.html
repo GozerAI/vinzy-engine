@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h2>Products</h2>
+
+<details>
+    <summary role="button" class="outline">New Product</summary>
+    <form method="post" action="/dashboard/products"
+          hx-post="/dashboard/products" hx-target="#products-table" hx-swap="innerHTML">
+        <div class="inline-form">
+            <div>
+                <label for="code">Code (3 chars)</label>
+                <input type="text" id="code" name="code" maxlength="3" required placeholder="ZUL">
+            </div>
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required placeholder="Product name">
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" placeholder="Optional">
+            </div>
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</details>
+
+<div id="products-table">
+    {% include "products/_table.html" %}
+</div>
+{% endblock %}

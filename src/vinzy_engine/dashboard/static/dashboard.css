@@ -1,0 +1,193 @@
+/* Vinzy-Engine Dashboard — custom overrides for Pico CSS */
+
+:root {
+    --nav-width: 220px;
+    --header-height: 56px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+.dash-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background: var(--pico-primary-background);
+    color: var(--pico-primary-inverse);
+    z-index: 100;
+}
+
+.dash-header h1 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: inherit;
+}
+
+/* Sidebar nav */
+.dash-nav {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 0;
+    width: var(--nav-width);
+    padding: 1rem 0;
+    overflow-y: auto;
+    background: var(--pico-card-background-color);
+    border-right: 1px solid var(--pico-muted-border-color);
+}
+
+.dash-nav a {
+    display: block;
+    padding: 0.5rem 1.25rem;
+    text-decoration: none;
+    color: var(--pico-color);
+    border-left: 3px solid transparent;
+}
+
+.dash-nav a:hover {
+    background: var(--pico-secondary-hover-background);
+}
+
+.dash-nav a.active {
+    border-left-color: var(--pico-primary);
+    font-weight: 600;
+    background: var(--pico-primary-focus);
+}
+
+/* Main content */
+.dash-content {
+    margin-left: var(--nav-width);
+    margin-top: var(--header-height);
+    padding: 1.5rem 2rem;
+    min-height: calc(100vh - var(--header-height));
+}
+
+/* Stat cards grid */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1.25rem;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--pico-primary);
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem;
+    color: var(--pico-muted-color);
+    margin-top: 0.25rem;
+}
+
+/* Status badges */
+.badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-active { background: #d4edda; color: #155724; }
+.badge-suspended { background: #fff3cd; color: #856404; }
+.badge-expired { background: #f8d7da; color: #721c24; }
+.badge-revoked { background: #e2e3e5; color: #383d41; }
+.badge-critical { background: #f8d7da; color: #721c24; }
+.badge-high { background: #fff3cd; color: #856404; }
+.badge-medium { background: #d1ecf1; color: #0c5460; }
+.badge-success { background: #d4edda; color: #155724; }
+.badge-failed { background: #f8d7da; color: #721c24; }
+.badge-pending { background: #d1ecf1; color: #0c5460; }
+
+/* Flash messages */
+.flash-container {
+    position: fixed;
+    top: calc(var(--header-height) + 0.5rem);
+    right: 1rem;
+    z-index: 200;
+    max-width: 400px;
+}
+
+.flash-msg {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    animation: flash-fade 4s forwards;
+}
+
+.flash-msg.success { background: #d4edda; color: #155724; }
+.flash-msg.error { background: #f8d7da; color: #721c24; }
+
+@keyframes flash-fade {
+    0% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}
+
+/* Tab nav for license detail */
+.tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--pico-muted-border-color);
+    margin-bottom: 1rem;
+}
+
+.tab-nav button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--pico-muted-color);
+}
+
+.tab-nav button:hover,
+.tab-nav button.active {
+    color: var(--pico-primary);
+    border-bottom-color: var(--pico-primary);
+}
+
+/* Inline form */
+.inline-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.inline-form label {
+    margin-bottom: 0;
+}
+
+.inline-form input,
+.inline-form select {
+    margin-bottom: 0;
+}
+
+/* Truncated text */
+.truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

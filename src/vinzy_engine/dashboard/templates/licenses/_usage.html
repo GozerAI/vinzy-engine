@@ -1,0 +1,51 @@
+{% if usage %}
+<h5>Usage Metrics</h5>
+<table>
+    <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Total</th>
+            <th>Records</th>
+            <th>Limit</th>
+            <th>Remaining</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in usage %}
+        <tr>
+            <td><code>{{ u.metric }}</code></td>
+            <td>{{ "%.1f"|format(u.total_value) }}</td>
+            <td>{{ u.record_count }}</td>
+            <td>{{ u.limit if u.limit is not none else "∞" }}</td>
+            <td>{{ "%.1f"|format(u.remaining) if u.remaining is not none else "∞" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><em>No usage data recorded.</em></p>
+{% endif %}
+
+{% if agent_usage %}
+<h5>Agent Usage</h5>
+<table>
+    <thead>
+        <tr>
+            <th>Agent</th>
+            <th>Metrics</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for agent, metrics in agent_usage.items() %}
+        <tr>
+            <td><code>{{ agent }}</code></td>
+            <td>
+                {% for metric, value in metrics.items() %}
+                {{ metric }}: {{ "%.1f"|format(value) }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}

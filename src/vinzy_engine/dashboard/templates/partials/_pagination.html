@@ -1,0 +1,13 @@
+{% if total_pages > 1 %}
+<nav style="display:flex;gap:0.5rem;justify-content:center;margin-top:1rem">
+    {% if page > 1 %}
+    <a href="?page={{ page - 1 }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if resolved_filter %}&resolved={{ resolved_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}"
+       role="button" class="outline">&laquo; Prev</a>
+    {% endif %}
+    <span style="padding:0.5rem">Page {{ page }} of {{ total_pages }} ({{ total }} total)</span>
+    {% if page < total_pages %}
+    <a href="?page={{ page + 1 }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if resolved_filter %}&resolved={{ resolved_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}"
+       role="button" class="outline">Next &raquo;</a>
+    {% endif %}
+</nav>
+{% endif %}

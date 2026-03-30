@@ -1,0 +1,29 @@
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Status</th>
+            <th>Tier</th>
+            <th>Machines</th>
+            <th>Expires</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in licenses %}
+        <tr>
+            <td class="truncate"><a href="/dashboard/licenses/{{ l.obj.id }}">{{ l.obj.id[:12] }}…</a></td>
+            <td><code>{{ l.product_code }}</code></td>
+            <td><span class="badge badge-{{ l.obj.status }}">{{ l.obj.status }}</span></td>
+            <td>{{ l.obj.tier }}</td>
+            <td>{{ l.obj.machines_used }}/{{ l.obj.machines_limit }}</td>
+            <td>{{ l.obj.expires_at.strftime('%Y-%m-%d') if l.obj.expires_at else "—" }}</td>
+            <td><a href="/dashboard/licenses/{{ l.obj.id }}">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7"><em>No licenses yet.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "partials/_pagination.html" %}

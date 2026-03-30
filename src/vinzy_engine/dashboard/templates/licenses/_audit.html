@@ -1,0 +1,25 @@
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Actor</th>
+            <th>Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in events %}
+        <tr>
+            <td>{{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') if e.created_at else "—" }}</td>
+            <td><code>{{ e.event_type }}</code></td>
+            <td>{{ e.actor }}</td>
+            <td class="truncate">{{ e.detail if e.detail else "—" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4"><em>No audit events.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if events|length >= 50 %}
+<p><a href="/dashboard/audit/{{ license_id }}">View full audit timeline &rarr;</a></p>
+{% endif %}

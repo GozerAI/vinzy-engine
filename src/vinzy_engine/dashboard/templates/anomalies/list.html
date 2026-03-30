@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Anomalies{% endblock %}
+{% block content %}
+<h2>Anomalies</h2>
+
+<!-- Filters -->
+<form method="get" action="/dashboard/anomalies" style="margin-bottom:1rem">
+    <div class="inline-form">
+        <div>
+            <label for="resolved">Status</label>
+            <select id="resolved" name="resolved" onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="false" {% if resolved_filter == "false" %}selected{% endif %}>Unresolved</option>
+                <option value="true" {% if resolved_filter == "true" %}selected{% endif %}>Resolved</option>
+            </select>
+        </div>
+        <div>
+            <label for="severity">Severity</label>
+            <select id="severity" name="severity" onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="critical" {% if severity_filter == "critical" %}selected{% endif %}>Critical</option>
+                <option value="high" {% if severity_filter == "high" %}selected{% endif %}>High</option>
+                <option value="medium" {% if severity_filter == "medium" %}selected{% endif %}>Medium</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<div id="anomalies-table">
+    {% include "anomalies/_table.html" %}
+</div>
+{% endblock %}

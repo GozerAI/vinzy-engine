@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Audit — {{ license_id[:12] }}…{% endblock %}
+{% block content %}
+<h2>Audit Timeline</h2>
+<p>License: <code>{{ license_id }}</code>
+    — <a href="/dashboard/licenses/{{ license_id }}">Back to license</a>
+</p>
+
+<div id="audit-events"
+     hx-get="/dashboard/audit/{{ license_id }}/events?page=1"
+     hx-trigger="load" hx-swap="innerHTML">
+    <p aria-busy="true">Loading events…</p>
+</div>
+{% endblock %}

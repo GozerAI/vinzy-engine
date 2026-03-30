@@ -1,0 +1,31 @@
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Actor</th>
+            <th>Detail</th>
+            <th>Hash</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in events %}
+        <tr>
+            <td>{{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') if e.created_at else "—" }}</td>
+            <td><code>{{ e.event_type }}</code></td>
+            <td>{{ e.actor }}</td>
+            <td class="truncate">{{ e.detail if e.detail else "—" }}</td>
+            <td class="truncate"><code>{{ e.event_hash[:16] }}…</code></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><em>No events.</em></td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if events|length >= 50 %}
+<button class="outline"
+        hx-get="/dashboard/audit/{{ license_id }}/events?page={{ page + 1 }}"
+        hx-target="#audit-events" hx-swap="innerHTML">
+    Load more…
+</button>
+{% endif %}

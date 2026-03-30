@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Webhook {{ endpoint.url }}{% endblock %}
+{% block content %}
+<h2>Webhook Endpoint</h2>
+
+<article>
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="badge badge-{{ endpoint.status }}">{{ endpoint.status }}</span>
+            <div style="display:flex;gap:0.5rem">
+                <button class="outline" style="padding:0.25rem 0.75rem;font-size:0.8rem"
+                        hx-post="/dashboard/webhooks/{{ endpoint.id }}/test"
+                        hx-target="#deliveries-table" hx-swap="innerHTML">
+                    Send Test
+                </button>
+                <button class="outline secondary" style="padding:0.25rem 0.75rem;font-size:0.8rem"
+                        hx-delete="/dashboard/webhooks/{{ endpoint.id }}"
+                        hx-confirm="Delete this endpoint?">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </header>
+    <table>
+        <tr><th style="width:200px">ID</th><td><code>{{ endpoint.id }}</code></td></tr>
+        <tr><th>URL</th><td>{{ endpoint.url }}</td></tr>
+        <tr><th>Description</th><td>{{ endpoint.description or "—" }}</td></tr>
+        <tr><th>Events</th><td>{{ endpoint.event_types|join(", ") if endpoint.event_types else "All (wildcard)" }}</td></tr>
+        <tr><th>Max Retries</th><td>{{ endpoint.max_retries }}</td></tr>
+        <tr><th>Timeout</th><td>{{ endpoint.timeout_seconds }}s</td></tr>
+        <tr><th>Created</th><td>{{ endpoint.created_at.strftime('%Y-%m-%d %H:%M UTC') if endpoint.created_at else "—" }}</td></tr>
+    </table>
+</article>
+
+<h3>Deliveries</h3>
+<div id="deliveries-table">
+    {% include "webhooks/_deliveries.html" %}
+</div>
+{% endblock %}

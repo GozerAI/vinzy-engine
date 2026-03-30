@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}License {{ license.id[:12] }}…{% endblock %}
+{% block content %}
+<h2>License Detail</h2>
+
+<article>
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <span>
+                <span class="badge badge-{{ license.status }}">{{ license.status }}</span>
+                {{ license.tier }} tier
+            </span>
+            <form method="post" action="/dashboard/licenses/{{ license.id }}"
+                  onsubmit="this.querySelector('[name=_method]') || null"
+                  style="margin:0">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="outline secondary" style="padding:0.25rem 0.75rem;font-size:0.8rem"
+                        formaction="/dashboard/licenses/{{ license.id }}"
+                        hx-delete="/dashboard/licenses/{{ license.id }}"
+                        hx-confirm="Delete this license?">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </header>
+    <table>
+        <tr><th style="width:200px">ID</th><td><code>{{ license.id }}</code></td></tr>
+        <tr><th>Product</th><td>{{ product.code if product else "—" }} — {{ product.name if product else "" }}</td></tr>
+        <tr><th>Customer</th><td>{{ customer.name if customer else "—" }} ({{ customer.email if customer else "" }})</td></tr>
+        <tr><th>Status</th><td><span class="badge badge-{{ license.status }}">{{ license.status }}</span></td></tr>
+        <tr><th>Tier</th><td>{{ license.tier }}</td></tr>
+        <tr><th>Machines</th><td>{{ license.machines_used }} / {{ license.machines_limit }}</td></tr>
+        <tr><th>Expires</th><td>{{ license.expires_at.strftime('%Y-%m-%d %H:%M UTC') if license.expires_at else "—" }}</td></tr>
+        <tr><th>Created</th><td>{{ license.created_at.strftime('%Y-%m-%d %H:%M UTC') if license.created_at else "—" }}</td></tr>
+    </table>
+
+    {% if entitlements %}
+    <h4>Entitlements</h4>
+    <table>
+        <thead>
+            <tr><th>Feature</th><th>Enabled</th><th>Limit</th><th>Used</th></tr>
+        </thead>
+        <tbody>
+            {% for e in entitlements %}
+            <tr>
+                <td>{{ e.feature }}</td>
+                <td>{{ "Yes" if e.enabled else "No" }}</td>
+                <td>{{ e.limit if e.limit is not none else "∞" }}</td>
+                <td>{{ e.used|default(0) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</article>
+
+<!-- Tabbed sections loaded via htmx -->
+<div class="tab-nav" id="detail-tabs">
+    <button class="active" hx-get="/dashboard/licenses/{{ license.id }}/audit"
+            hx-target="#tab-content" hx-swap="innerHTML"
+            onclick="document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+        Audit Trail
+    </button>
+    <button hx-get="/dashboard/licenses/{{ license.id }}/anomalies"
+            hx-target="#tab-content" hx-swap="innerHTML"
+            onclick="document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+        Anomalies
+    </button>
+    <button hx-get="/dashboard/licenses/{{ license.id }}/usage"
+            hx-target="#tab-content" hx-swap="innerHTML"
+            onclick="document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+        Usage
+    </button>
+</div>
+<div id="tab-content">
+    <p><em>Select a tab above to load data.</em></p>
+</div>
+{% endblock %}
