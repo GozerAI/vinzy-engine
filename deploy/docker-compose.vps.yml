@@ -1,0 +1,26 @@
+services:
+  vinzy:
+    build: ..
+    container_name: vinzy
+    env_file: ../.env
+    volumes:
+      - vinzy_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - webproxy
+      - backend
+
+volumes:
+  vinzy_data:
+
+networks:
+  webproxy:
+    external: true
+  backend:
+    external: true
